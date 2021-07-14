@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "311288677758",
+    "project_id": "marsyeats",
+    "storage_bucket": "marsyeats.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:311288677758:android:9a0cb7de8e48ea6307df2f",
+        "android_client_info": {
+          "package_name": "com.number19th.marsyeats"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "311288677758-i4t1t637actek24740lgku85v442sr9n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.number19th.marsyeats",
+            "certificate_hash": "37aa2310cd77348e5064ffbaa15a24a55f65e8d2"
+          }
+        },
+        {
+          "client_id": "311288677758-94tg71iu5haiukb4f0cub45e0db8qujn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrwBDQg-q00IB6CUaevMqxCU4qzGjUtuA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "311288677758-94tg71iu5haiukb4f0cub45e0db8qujn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
