@@ -35,10 +35,10 @@ dependencies:
   provider: ^4.3.3
   google_sign_in: ^4.5.1
   expansion_tile_card: ^1.1.0
-  stepper_counter_swipe: ^1.0.0
   smart_select: ^4.3.2
   splash_screen_view: ^1.0.3
   rflutter_alert: ^1.1.0
+  numberpicker: ^2.1.1
   
 dev_dependencies:
   flutter_test:

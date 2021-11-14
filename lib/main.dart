@@ -10,7 +10,11 @@ import 'package:firebase_core/firebase_core.dart';
 // import 'package:splash_screen_view/SplashScreenView.dart';
 // import 'package:splash_screen_view/TyperAnimatedText.dart';
 
-void main() => runApp(StartingApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(StartingApp());
+}
 
 class StartingApp extends StatefulWidget {
   @override
@@ -27,14 +31,6 @@ class _StartingAppState extends State<StartingApp> {
     ),
   );
   Widget page;
-
-  @override
-  void initState() {
-    super.initState();
-    Firebase.initializeApp().whenComplete(
-      () => setState(() {}),
-    );
-  }
 
   // void login() {
   //   signInWithGoogle().then((user) => setState(() {

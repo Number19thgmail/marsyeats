@@ -7,8 +7,8 @@ import 'package:marsyeats/elements/day.dart';
 import 'package:marsyeats/servises/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_select/smart_select.dart';
-import 'package:stepper_counter_swipe/stepper_counter_swipe.dart';
 import 'package:marsyeats/servises/operation.dart';
+import 'package:numberpicker/numberpicker.dart';
 
 class Homepage extends StatefulWidget {
   final String name;
@@ -20,7 +20,7 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   String title = 'Что дали?';
   Foods selectedType = food.where((element) => element.type == 'dry').first;
-  int weigth = 10;
+  int weigth = 8;
   TextEditingController textController = TextEditingController();
 
   Widget getDescription() {
@@ -51,20 +51,18 @@ class _HomepageState extends State<Homepage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(40),
       ),
-      child: StepperSwipe(
-        initialValue: 10,
-        speedTransitionLimitCount: 3,
-        firstIncrementDuration: Duration(milliseconds: 250),
-        secondIncrementDuration: Duration(milliseconds: 100),
-        direction: Axis.horizontal,
-        iconsColor: Colors.black,
-        dragButtonColor: Colors.black45,
-        withFastCount: true,
+      child: NumberPicker(
+        axis: Axis.horizontal,
+        value: weigth,
+        itemCount: 5,
+        itemWidth: 50,
+        haptics: true,
         maxValue: 50,
         minValue: 0,
-        stepperValue: 10,
         onChanged: (curr) {
-          weigth = curr;
+          setState(() {
+            weigth = curr;
+          });
         },
       ),
     );
@@ -77,11 +75,8 @@ class _HomepageState extends State<Homepage> {
     void _onChangeMeals() async {
       OneMeal current = OneMeal(
         food: selectedType.type,
-        time: DateTime.now()
-            .toString(), //DateFormat('HH:mm').format(DateTime.now()),
-        description: selectedType.type == 'dry'
-            ? weigth.toString()
-            : textController.text,
+        time: DateTime.now().toString(), //DateFormat('HH:mm').format(DateTime.now()),
+        description: selectedType.type == 'dry' ? weigth.toString() : textController.text,
         name: '${widget.name.toString().split(' ').first}',
       );
       await DatabaseService().addMeal(meal: current);
@@ -90,8 +85,7 @@ class _HomepageState extends State<Homepage> {
 
     void selected(S2SingleState<String> s) => setState(() {
           title = s.value.toString();
-          selectedType =
-              food.where((element) => element.description == s.value).first;
+          selectedType = food.where((element) => element.description == s.value).first;
         });
 
     Widget selectFood() {
@@ -162,8 +156,7 @@ class _HomepageState extends State<Homepage> {
                     meals: meals
                         .where(
                           (element) =>
-                              DateFormat('MM.dd')
-                                  .format(DateTime.parse(element.time)) ==
+                              DateFormat('MM.dd').format(DateTime.parse(element.time)) ==
                               DateFormat('MM.dd').format(
                                 DateTime.now().add(Duration(days: -1)),
                               ),
@@ -175,8 +168,7 @@ class _HomepageState extends State<Homepage> {
                     meals: meals
                         .where(
                           (element) =>
-                              DateFormat('MM.dd')
-                                  .format(DateTime.parse(element.time)) ==
+                              DateFormat('MM.dd').format(DateTime.parse(element.time)) ==
                               DateFormat('MM.dd').format(
                                 DateTime.now(),
                               ),
@@ -196,9 +188,7 @@ class _HomepageState extends State<Homepage> {
                   Day(
                     meals: meals
                         .where(
-                          (element) => DateTime.parse(element.time)
-                              .add(Duration(days: 1))
-                              .isAfter(DateTime.now()),
+                          (element) => DateTime.parse(element.time).add(Duration(days: 1)).isAfter(DateTime.now()),
                         )
                         .toList(),
                     header: 'За последние 24 часа',
@@ -221,9 +211,7 @@ class _HomepageState extends State<Homepage> {
                     ),
                     Container(
                       height: 80,
-                      child: selectedType.type == 'dry'
-                          ? stepWetFood()
-                          : getDescription(),
+                      child: selectedType.type == 'dry' ? stepWetFood() : getDescription(),
                     ),
                   ]),
                 ),
