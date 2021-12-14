@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:marsyeats/data/dataMeal.dart';
 import 'package:marsyeats/data/ingestion.dart';
 import 'package:marsyeats/servises/ingestions/ingestions.dart';
+// ignore: implementation_imports
 import 'package:provider/src/provider.dart';
 
 class Meal extends StatelessWidget {

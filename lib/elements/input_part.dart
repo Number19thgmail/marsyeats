@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:marsyeats/data/dataMeal.dart';
 import 'package:marsyeats/data/food.dart';
 import 'package:marsyeats/elements/input/info_input_widget.dart';
+// ignore: implementation_imports
 import 'package:provider/src/provider.dart';
 import 'package:rxdart/rxdart.dart';
 

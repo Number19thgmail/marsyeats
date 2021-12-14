@@ -3,6 +3,7 @@ import 'package:marsyeats/data/dataMeal.dart';
 import 'package:marsyeats/data/ingestion.dart';
 import 'package:marsyeats/elements/eatingFor24Hours.dart';
 import 'package:marsyeats/elements/meal.dart';
+// ignore: implementation_imports
 import 'package:provider/src/provider.dart';
 import 'package:rxdart/rxdart.dart';
 

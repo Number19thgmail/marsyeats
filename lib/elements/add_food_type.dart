@@ -5,6 +5,7 @@ import 'package:marsyeats/data/food.dart';
 import 'package:marsyeats/data/type_food.dart';
 import 'package:marsyeats/elements/input/info_input_widget.dart';
 import 'package:marsyeats/servises/ingestions/foods.dart';
+// ignore: implementation_imports
 import 'package:provider/src/provider.dart';
 import 'package:rxdart/rxdart.dart';
 

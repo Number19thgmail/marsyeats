@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:marsyeats/data/dataMeal.dart';
 import 'package:marsyeats/data/food.dart';
+// ignore: implementation_imports
 import 'package:provider/src/provider.dart';
 
 import 'add_food_type.dart';

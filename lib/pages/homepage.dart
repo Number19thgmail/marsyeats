@@ -1,7 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:marsyeats/data/food.dart';
 import 'package:marsyeats/data/ingestion.dart';
 import 'package:marsyeats/data/dataMeal.dart';
 import 'package:marsyeats/elements/day.dart';

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:marsyeats/data/dataMeal.dart';
+// ignore: implementation_imports
 import 'package:provider/src/provider.dart';
 
 class EatingFor24Hours extends StatelessWidget {
