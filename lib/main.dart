@@ -30,20 +30,13 @@ class _StartingAppState extends State<StartingApp> {
       height: double.infinity,
     ),
   );
-  Widget page;
-
-  // void login() {
-  //   signInWithGoogle().then((user) => setState(() {
-  //         page = Homepage(name: user.displayName);
-  //         signIn = true;
-  //       }));
-  // }
+  late Widget page;
 
   Widget sign() {
     getUser().then(
       (user) => setState(
         () {
-          page = Homepage(name: user.displayName);
+          page = Homepage(name: user!.displayName ?? '');
           signIn = true;
         },
       ),
@@ -78,10 +71,20 @@ class _StartingAppState extends State<StartingApp> {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
+          primaryColor: Colors.blueAccent,
           textTheme: TextTheme(
             caption: TextStyle(
               fontSize: 16.0,
               color: Colors.blue,
+            ),
+          ),
+        ),
+        darkTheme: ThemeData(
+          primaryColor: Colors.black,
+          textTheme: TextTheme(
+            caption: TextStyle(
+              fontSize: 16.0,
+              color: Colors.white38,
             ),
           ),
         ),

@@ -1,52 +1,85 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:marsyeats/data/type_food.dart';
 import 'package:intl/intl.dart';
-import 'package:marsyeats/servises/operation.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:marsyeats/data/dataMeal.dart';
+import 'package:marsyeats/data/ingestion.dart';
+import 'package:marsyeats/servises/ingestions/ingestions.dart';
+import 'package:provider/src/provider.dart';
 
 class Meal extends StatelessWidget {
-  final String id;
-  final String descrition;
-  final DateTime time;
-  final Foods type;
-  final String name;
+  final Ingestion ingestion;
   Meal({
-    @required this.id,
-    @required this.time,
-    @required this.type,
-    @required this.descrition,
-    @required this.name,
-    Key key,
+    required this.ingestion,
+    Key? key,
   }) : super(key: key);
 
-   @override
+  @override
   Widget build(BuildContext context) {
-    String desc = descrition == '' ? type.description : descrition;
-    String rName = name == 'Dmitry' ? 'Дима дал' : 'Лера дала';
-    String given = type.type == 'dry' ? '$rName $desc грамм' : '$rName $desc';
+    String rName = ingestion.name == 'Dmitry' ? 'Дима дал' : 'Лера дала';
+    String given = '${ingestion.weight} грамм';
+    DataMeal data = context.watch<DataMeal>();
 
-    void deleteCurrentMeal()  {
-    Alert(
-      context: context,
-      type: AlertType.warning,
-      title: 'Удалить выбранный элемент?',
-      buttons: [
-        DialogButton(
-          child: Text('Нет'),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+    void deleteCurrentMeal() {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Что сделать?'),
+          actions: [
+            CupertinoDialogAction(
+              child: Text('Удалить'),
+              onPressed: () {
+                IngestionService().deleteIngestion(ingestion.docId);
+                Navigator.pop(context);
+              },
+            ),
+            CupertinoDialogAction(
+              child: Text('Изменить время'),
+              onPressed: () async {
+                DateTime? date = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2019),
+                  lastDate: DateTime(2055),
+                );
+                if (date != null) {
+                  TimeOfDay? time = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                    initialEntryMode: TimePickerEntryMode.dial,
+                    builder: (BuildContext context, Widget? child) {
+                      return MediaQuery(
+                        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                        child: child!,
+                      );
+                    },
+                  );
+                  if (time != null) {
+                    DateTime selected = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+                    IngestionService().changeIngestion(
+                      meal: Ingestion(
+                        time: Timestamp.fromDate(selected),
+                        foodId: ingestion.foodId,
+                        weight: ingestion.weight,
+                        name: ingestion.name,
+                        docId: ingestion.docId,
+                      ),
+                    );
+                  }
+                }
+                Navigator.pop(context);
+              },
+            ),
+            CupertinoDialogAction(
+              child: Text('Отмена'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
         ),
-        DialogButton(
-          child: Text('Да'),
-          onPressed: () {
-            DatabaseService().deleteMeal(id);
-            Navigator.pop(context);
-          },
-        ),
-      ],
-    ).show();
-  }
+      );
+    }
 
     return GestureDetector(
       onLongPress: deleteCurrentMeal,
@@ -68,19 +101,21 @@ class Meal extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              '$given',
+              '$rName $given',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.caption,
             ),
+            const SizedBox(height: 2),
             Image(
-              height: 50.0,
+              height: 45.0,
               image: AssetImage(
-                type.image,
+                'assets/images/${data.getFoodTypes.firstWhere((element) => element.id == ingestion.foodId).image}',
               ),
               fit: BoxFit.fitHeight,
             ),
+            const SizedBox(height: 2),
             Text(
-              'В ${DateFormat('HH:mm').format(time)}',
+              'В ${DateFormat('HH:mm').format(ingestion.time.toDate())}',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.caption,
             ),

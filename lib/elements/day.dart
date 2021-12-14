@@ -1,60 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:marsyeats/data/oneMeal.dart';
-import 'package:marsyeats/data/type_food.dart';
+import 'package:marsyeats/data/dataMeal.dart';
+import 'package:marsyeats/data/ingestion.dart';
 import 'package:marsyeats/elements/eatingFor24Hours.dart';
 import 'package:marsyeats/elements/meal.dart';
+import 'package:provider/src/provider.dart';
+import 'package:rxdart/rxdart.dart';
 
 class Day extends StatefulWidget {
-  final List<OneMeal> meals;
+  final List<Ingestion>? meals;
   final String header;
-  Day({@required this.meals, @required this.header});
+  Day({required this.meals, required this.header});
 
   @override
-  _DayState createState() => _DayState();
+  State<Day> createState() => _DayState();
 }
 
 class _DayState extends State<Day> {
-  bool show = false;
+  BehaviorSubject<bool> show = BehaviorSubject.seeded(false);
 
   @override
   Widget build(BuildContext context) {
-    int weight = 0;
-    widget.meals.forEach((element) {
-      if (element.food == 'dry') {
-        weight += int.parse(element.description);
-      }
-    });
-
-    var meal = Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      alignment: WrapAlignment.center,
-      direction: Axis.horizontal,
-      children: <Meal>[
-        ...widget.meals
-            .map((value) => Meal(
-                  id: value.docId,
-                  descrition: value.description,
-                  time: DateTime.parse(value.time),
-                  type:
-                      food.where((element) => element.type == value.food).first,
-                  name: value.name,
-                ))
-            .toList(),
-      ],
-    );
-
-    Widget info() {
-      return Container(
-        margin: const EdgeInsets.all(10.0),
-        child: Column(
-          children: [
-            meal,
-          ],
-        ),
-      );
-    }
-
+    DataMeal data = context.watch<DataMeal>();
+    if (data.getFoodTypes.isEmpty) return Container();
     return Container(
       margin: const EdgeInsets.fromLTRB(5, 5, 5, 0),
       child: Card(
@@ -72,17 +39,49 @@ class _DayState extends State<Day> {
                   ),
                 ),
               ),
-              child: EatingFor24Hours.builder(
-                weight: weight,
+              child: EatingFor24Hours(
+                weight: ((widget.meals?.isNotEmpty ?? false) && data.getFoodTypes.isNotEmpty)
+                    ? widget.meals
+                            ?.map((e) =>
+                                e.weight *
+                                data.getFoodTypes.firstWhere((element) => element.id == e.foodId).calorie /
+                                100)
+                            .fold(0, (p, s) => s = s + (p ?? 0)) ??
+                        0
+                    : 0,
                 title: widget.header,
               ),
               onPressed: () {
-                setState(() {
-                  show = !show;
-                });
+                show.add(!show.value);
               },
             ),
-            show ? info() : SizedBox(height: 0),
+            StreamBuilder(
+              stream: show.stream,
+              builder: (context, snapshot) {
+                if (show.value)
+                  return Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      alignment: WrapAlignment.center,
+                      direction: Axis.horizontal,
+                      children: <Meal>[
+                        if (widget.meals?.isNotEmpty ?? false)
+                          ...widget.meals
+                                  ?.map(
+                                    (value) => Meal(
+                                      ingestion: value,
+                                    ),
+                                  )
+                                  .toList() ??
+                              [],
+                      ],
+                    ),
+                  );
+                return SizedBox(height: 0);
+              },
+            ),
           ],
         ),
       ),

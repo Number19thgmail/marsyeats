@@ -9,6 +9,7 @@
 .history
 .svn/
 /android/app/release
+.fvm
 
 # IntelliJ related
 *.iml

@@ -1,145 +1,24 @@
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:marsyeats/data/oneMeal.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:marsyeats/data/food.dart';
+import 'package:marsyeats/data/ingestion.dart';
 import 'package:marsyeats/data/dataMeal.dart';
-import 'package:marsyeats/data/type_food.dart';
 import 'package:marsyeats/elements/day.dart';
+import 'package:marsyeats/elements/food_type.dart';
+import 'package:marsyeats/elements/input_part.dart';
+import 'package:marsyeats/elements/input_weigth.dart';
 import 'package:marsyeats/servises/auth.dart';
+import 'package:marsyeats/servises/ingestions/ingestions.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_select/smart_select.dart';
-import 'package:marsyeats/servises/operation.dart';
-import 'package:numberpicker/numberpicker.dart';
 
-class Homepage extends StatefulWidget {
+class Homepage extends StatelessWidget {
   final String name;
-  const Homepage({Key key, this.name}) : super(key: key);
-  @override
-  _HomepageState createState() => _HomepageState();
-}
-
-class _HomepageState extends State<Homepage> {
-  String title = 'Что дали?';
-  Foods selectedType = food.where((element) => element.type == 'dry').first;
-  int weigth = 8;
-  TextEditingController textController = TextEditingController();
-
-  Widget getDescription() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      margin: const EdgeInsets.all(8.0),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: TextField(
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: 'По-моему, тут надо дополнить что дали',
-              hintMaxLines: 2,
-            ),
-            textAlign: TextAlign.center,
-            controller: textController,
-            textInputAction: TextInputAction.done),
-      ),
-    );
-  }
-
-  Widget stepWetFood() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(40),
-      ),
-      child: NumberPicker(
-        axis: Axis.horizontal,
-        value: weigth,
-        itemCount: 5,
-        itemWidth: 50,
-        haptics: true,
-        maxValue: 50,
-        minValue: 0,
-        onChanged: (curr) {
-          setState(() {
-            weigth = curr;
-          });
-        },
-      ),
-    );
-  }
+  const Homepage({Key? key, required this.name}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    List<OneMeal> meals = context.watch<DataMeal>().getMeals;
-
-    void _onChangeMeals() async {
-      OneMeal current = OneMeal(
-        food: selectedType.type,
-        time: DateTime.now().toString(), //DateFormat('HH:mm').format(DateTime.now()),
-        description: selectedType.type == 'dry' ? weigth.toString() : textController.text,
-        name: '${widget.name.toString().split(' ').first}',
-      );
-      await DatabaseService().addMeal(meal: current);
-      textController.clear();
-    }
-
-    void selected(S2SingleState<String> s) => setState(() {
-          title = s.value.toString();
-          selectedType = food.where((element) => element.description == s.value).first;
-        });
-
-    Widget selectFood() {
-      return Center(
-        child: SmartSelect<String>.single(
-          title: "Что дали?",
-          modalType: S2ModalType.bottomSheet,
-          value: 'Сухой корм',
-          onChange: selected,
-          choiceItems: food
-              .map((e) => S2Choice(
-                    value: e.description,
-                    title: e.description,
-                  ))
-              .toList(),
-          tileBuilder: (context, state) {
-            return Container(
-              margin: EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: ListTile(
-                title: Text(state.value),
-                leading: CircleAvatar(
-                  backgroundColor: Theme.of(context).dividerColor,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Image(
-                      image: AssetImage(
-                        selectedType.image,
-                      ),
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
-                trailing: const Icon(
-                  Icons.keyboard_arrow_right,
-                  color: Colors.grey,
-                ),
-                onTap: state.showModal,
-              ),
-            );
-          },
-        ),
-      );
-    }
-
-    Widget _makePoints() {
-      return CircleAvatar(
-        backgroundColor: Colors.orange,
-      );
-    }
-
+    DataMeal data = context.watch<DataMeal>();
     return Scaffold(
       body: Column(
         children: [
@@ -153,10 +32,10 @@ class _HomepageState extends State<Homepage> {
                     child: Text('outlog'),
                   ),
                   Day(
-                    meals: meals
+                    meals: data.getIngestions
                         .where(
                           (element) =>
-                              DateFormat('MM.dd').format(DateTime.parse(element.time)) ==
+                              DateFormat('MM.dd').format(element.time.toDate()) ==
                               DateFormat('MM.dd').format(
                                 DateTime.now().add(Duration(days: -1)),
                               ),
@@ -165,10 +44,10 @@ class _HomepageState extends State<Homepage> {
                     header: 'Вчера',
                   ),
                   Day(
-                    meals: meals
+                    meals: data.getIngestions
                         .where(
                           (element) =>
-                              DateFormat('MM.dd').format(DateTime.parse(element.time)) ==
+                              DateFormat('MM.dd').format(element.time.toDate()) ==
                               DateFormat('MM.dd').format(
                                 DateTime.now(),
                               ),
@@ -181,14 +60,23 @@ class _HomepageState extends State<Homepage> {
                     child: Container(
                       height: 20,
                       child: Center(
-                        child: _makePoints(),
+                        child: CircleAvatar(
+                          backgroundColor: Colors.orange,
+                        ),
                       ),
                     ),
                   ),
                   Day(
-                    meals: meals
+                    meals: data.getIngestions
                         .where(
-                          (element) => DateTime.parse(element.time).add(Duration(days: 1)).isAfter(DateTime.now()),
+                          (element) => element.time
+                              .toDate()
+                              .add(
+                                Duration(days: 1),
+                              )
+                              .isAfter(
+                                DateTime.now(),
+                              ),
                         )
                         .toList(),
                     header: 'За последние 24 часа',
@@ -198,33 +86,33 @@ class _HomepageState extends State<Homepage> {
             ),
           ),
           Container(
+            padding: const EdgeInsets.all(8),
             color: Colors.cyan,
-            height: 200,
-            width: 500,
             child: Row(
               children: [
                 Expanded(
                   child: Column(children: [
-                    Container(
-                      height: 100,
-                      child: selectFood(),
-                    ),
-                    Container(
-                      height: 80,
-                      child: selectedType.type == 'dry' ? stepWetFood() : getDescription(),
-                    ),
+                    FoodTypeSelect(),
+                    data.selectedType?.isPacked ?? false ? InputPart() : InputWeigth(),
                   ]),
                 ),
-                GestureDetector(
-                  onTap: _onChangeMeals,
+                InkWell(
+                  onTap: () async {
+                    Ingestion current = Ingestion(
+                      time: Timestamp.now(),
+                      foodId: data.selectedType?.id ?? 0,
+                      weight: data.weigth,
+                      name: name.split(' ').first,
+                    );
+                    await IngestionService().addIngestion(meal: current);
+                  },
                   child: Container(
-                    height: 150,
-                    width: MediaQuery.of(context).size.width / 4,
                     color: Colors.transparent,
                     alignment: Alignment.centerRight,
                     child: Image(
                       image: AssetImage('assets/images/put_food.png'),
                       fit: BoxFit.fitWidth,
+                      width: MediaQuery.of(context).size.width / 4,
                     ),
                   ),
                 ),
