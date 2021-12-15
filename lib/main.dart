@@ -5,10 +5,6 @@ import 'package:marsyeats/servises/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-// import 'package:splash_screen_view/ColorizeAnimatedText.dart';
-// import 'package:splash_screen_view/ScaleAnimatedText.dart';
-// import 'package:splash_screen_view/SplashScreenView.dart';
-// import 'package:splash_screen_view/TyperAnimatedText.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,7 +48,7 @@ class _StartingAppState extends State<StartingApp> {
               image: AssetImage('assets/images/splash.png'),
             ),
             Text(
-              'Выполняется вход в Google аккаут',
+              'Выполняется вход в Google аккаунт',
               style: TextStyle(
                 fontSize: 20,
                 color: Colors.lightGreenAccent[300],
@@ -79,18 +75,18 @@ class _StartingAppState extends State<StartingApp> {
             ),
           ),
         ),
-        darkTheme: ThemeData(
-          primaryColor: Colors.black,
-          textTheme: TextTheme(
-            caption: TextStyle(
-              fontSize: 16.0,
-              color: Colors.white38,
-            ),
-          ),
-        ),
+        // darkTheme: ThemeData(
+        //   primaryColor: Colors.black,
+        //   textTheme: TextTheme(
+        //     caption: TextStyle(
+        //       fontSize: 16.0,
+        //       color: Colors.white38,
+        //     ),
+        //   ),
+        // ),
         color: Colors.cyanAccent,
         home: SafeArea(
-          child: signIn ? page : sign(), //Homepage(),
+          child: signIn ? page : sign(),
         ),
       ),
     );

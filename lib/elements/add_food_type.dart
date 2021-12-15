@@ -101,7 +101,7 @@ class AddFoodType extends StatelessWidget {
                       ? () {
                           FoodService().addFoodType(
                             type: FoodType(
-                              id: foodTypes.isNotEmpty ? foodTypes.last.id : 0,
+                              id: foodTypes.isNotEmpty ? foodTypes.last.id + 1 : 0,
                               title: nameController.text,
                               image: imageController.text,
                               calorie: int.parse(calorieController.text),
